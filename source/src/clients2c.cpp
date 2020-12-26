@@ -1234,6 +1234,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                 servstate.autoteam = sm & 1;
                 servstate.mastermode = (sm >> 2) & MM_MASK;
                 servstate.matchteamsize = sm >> 4;
+                servstate.friendlyfire = sm >> 8; // TODO: fix 
                 //if(sm & AT_SHUFFLE) playsound(TEAMSHUFFLE);    // TODO
                 break;
             }
@@ -1282,6 +1283,9 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                         break;
                     case SA_STOPDEMO:
                         // compatibility
+                        break;
+                    case SA_FRIENDLY_FIRE:
+                        conoutf("Received friendly fire vote!");
                         break;
                     case SA_REMBANS:
                     case SA_SHUFFLETEAMS:

@@ -301,6 +301,27 @@ struct recorddemoaction : enableaction            // TODO: remove completely
     }
 };
 
+struct friendlyfireaction : enableaction 
+{
+    void perform() {
+        // call this method upon vote success
+
+        // update server state
+        friendlyfire = enable;
+
+        // announce new server state to clients
+        int sm = (autoteam ? AT_ENABLED : AT_DISABLED) | ((mastermode & MM_MASK) << 2) | (matchteamsize << 4) | ((friendlyfire ? FF_ENABLED : FF_DISABLED) << 8);
+        // the format indicates which protocol should be used and what params, e.g. r -> reliable, i-> int
+        sendf(-1, 1, "ri2", SV_SERVERMODE, sm);
+    }
+    bool isvalid() { return serveraction::isvalid(); }
+    friendlyfireaction(bool enable) : enableaction(enable)
+    {
+        role = CR_DEFAULT;
+        if (isvalid()) formatstring(desc)("%s friendlyfire", enable ? "enable" : "disable");
+    }
+};
+
 struct cleardemosaction : serveraction
 {
     int demo;

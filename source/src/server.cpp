@@ -44,6 +44,8 @@ int mastermode = MM_OPEN;
 static bool autoteam = true;
 int matchteamsize = 0;
 
+static bool friendlyfire = true;
+
 long int incoming_size = 0;
 
 static bool forceintermission = false;
@@ -3612,6 +3614,9 @@ void process(ENetPacket *packet, int sender, int chan)
                         break;
                     case SA_AUTOTEAM:
                         vi->action = new autoteamaction((vi->num1 = getint(p)) > 0);
+                        break;
+                    case SA_FRIENDLY_FIRE:
+                        vi->action = new friendlyfireaction((vi->num1 = getint(p)) != 0);
                         break;
                     case SA_SHUFFLETEAMS:
                         vi->action = new shuffleteamaction();

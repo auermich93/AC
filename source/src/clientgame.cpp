@@ -1358,7 +1358,7 @@ COMMAND(dropflag, "");
 
 char *votestring(int type, const char *arg1, const char *arg2, const char *arg3)
 {
-    const char *msgs[] = { "kick player %s, reason: %s", "ban player %s, reason: %s", "remove all bans", "set mastermode to %s", "%s autoteam", "force player %s to team %s", "give admin to player %s", "load map %s in mode %s%s%s", "%s demo recording for the next match", "stop demo recording", "clear all demos", "set server description to '%s'", "shuffle teams"};
+    const char *msgs[] = { "kick player %s, reason: %s", "ban player %s, reason: %s", "remove all bans", "set mastermode to %s", "%s autoteam", "force player %s to team %s", "give admin to player %s", "load map %s in mode %s%s%s", "%s demo recording for the next match", "stop demo recording", "clear all demos", "set server description to '%s'", "shuffle teams", "%s friendly fire"};
     const char *msg = msgs[type];
     char *out = newstring(MAXSTRLEN);
     out[MAXSTRLEN] = '\0';
@@ -1392,10 +1392,12 @@ char *votestring(int type, const char *arg1, const char *arg2, const char *arg3)
             break;
         case SA_AUTOTEAM:
         case SA_RECORDDEMO:
+        case SA_FRIENDLY_FIRE:
             formatstring(out)(msg, atoi(arg1) == 0 ? "disable" : "enable");
             break;
         case SA_MAP:
         {
+            conoutf("Calling new map with params: %s %s %s", arg1, arg2, arg3);
             int n = atoi(arg2);
             string timestr = "";
             if(arg3 && arg3[0])
@@ -1439,7 +1441,7 @@ votedisplayinfo *newvotedisplayinfo(playerent *owner, int type, const char *arg1
 
 votedisplayinfo *curvote = NULL, *calledvote = NULL;
 
-void callvote(int type, const char *arg1, const char *arg2, const char *arg3)
+void callvote(int type, const char *arg1, const char *arg2, const char *arg3, const char *arg4)
 {
     if(calledvote) return;
     votedisplayinfo *v = newvotedisplayinfo(player1, type, arg1, arg2, arg3);
@@ -1475,10 +1477,6 @@ void callvote(int type, const char *arg1, const char *arg2, const char *arg3)
                 putint(p, atoi(arg2));
                 break;
             default:
-
-
-
-
                 putint(p, atoi(arg1));
                 break;
         }
@@ -1488,7 +1486,7 @@ void callvote(int type, const char *arg1, const char *arg2, const char *arg3)
     else conoutf("\f3invalid vote");
 }
 
-void scallvote(int *type, const char *arg1, const char *arg2)
+void scallvote(int *type, const char *arg1, const char *arg2, const char *arg3)
 {
     if(type && inmainloop)
     {
@@ -1500,7 +1498,7 @@ void scallvote(int *type, const char *arg1, const char *arg2)
                 //FIXME: this stupid conversion of ints to strings and back should
                 //  really be replaced with a saner method
                 defformatstring(m)("%d", nextmode);
-                callvote(t, arg1, m, arg2);
+                callvote(t, arg1, m, arg2, arg3);
                 break;
             }
             case SA_KICK:
@@ -1521,8 +1519,14 @@ void scallvote(int *type, const char *arg1, const char *arg2)
                 if(team < 0) arg2 = (team == 0) ? "RVSF" : "CLA";
                 // fall through
             }
+            case SA_FRIENDLY_FIRE: 
+            {
+                conoutf("Calling friendly fire vote");
+                // TODO: enabling friendly fire if already enabled doesn't make sense, likewise for disabled friendly fire
+                // fall through
+            }
             default:
-                callvote(t, arg1, arg2);
+                callvote(t, arg1, arg2, arg3);
         }
     }
 }
@@ -1635,7 +1639,8 @@ void gonext(int *arg1)
 }
 COMMAND(gonext, "i");
 
-COMMANDN(callvote, scallvote, "iss"); //fixme,ah
+// the last param indicates the signature, e.g. isss = int,string,string,string
+COMMANDN(callvote, scallvote, "isss"); //fixme,ah
 COMMANDF(vote, "i", (int *v) { vote(*v); });
 
 void cleanplayervotes(playerent *p)
