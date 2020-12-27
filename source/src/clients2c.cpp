@@ -789,7 +789,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                     armour = getint(p),
                     health = getint(p);
                 playerent *target = getclient(tcn), *actor = getclient(acn);
-                if(!target || !actor) break;
+                if(!target || !actor || (isteam(actor->team, target->team) && servstate.friendlyfire == FF_DISABLED)) break;
                 target->armour = armour;
                 target->health = health;
                 dodamage(damage, target, actor, -1, type==SV_GIBDAMAGE, false);
@@ -1285,7 +1285,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                         // compatibility
                         break;
                     case SA_FRIENDLY_FIRE:
-                        conoutf("Received friendly fire vote!");
+                        v = newvotedisplayinfo(d, type, NULL, NULL);
                         break;
                     case SA_REMBANS:
                     case SA_SHUFFLETEAMS:
