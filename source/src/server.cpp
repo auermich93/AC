@@ -320,7 +320,7 @@ int *numteamclients(int exclude = -1)
 
 int sendservermode(bool send = true)
 {
-    int sm = (autoteam ? AT_ENABLED : AT_DISABLED) | ((mastermode & MM_MASK) << 2) | (matchteamsize << 4);
+    int sm = (autoteam ? AT_ENABLED : AT_DISABLED) | ((mastermode & MM_MASK) << 2) | (matchteamsize << 4) | ((friendlyfire ? FF_ENABLED : FF_DISABLED) << 8);
     if(send) sendf(-1, 1, "ri2", SV_SERVERMODE, sm);
     return sm;
 }
