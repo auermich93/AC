@@ -314,7 +314,7 @@ struct friendlyfireaction : enableaction
         // the format indicates which protocol should be used and what params, e.g. r -> reliable, i-> int
         sendf(-1, 1, "ri2", SV_SERVERMODE, sm);
     }
-    bool isvalid() { return serveraction::isvalid(); }
+    bool isvalid() { return serveraction::isvalid() && m_teammode; }
     friendlyfireaction(bool enable) : enableaction(enable)
     {
         role = CR_DEFAULT;
