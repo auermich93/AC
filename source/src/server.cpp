@@ -2746,7 +2746,7 @@ int checktype(int type, client *cl)
     {
         loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
         loopi(sizeof(edittypes)/sizeof(int)) if(type == edittypes[i]) return smode==GMODE_COOPEDIT ? type : -1;
-        if(++cl->overflow >= 200) return -2;
+        // if(++cl->overflow >= 200) return -2;
     }
     return type;
 }
@@ -3616,7 +3616,10 @@ void process(ENetPacket *packet, int sender, int chan)
                         vi->action = new autoteamaction((vi->num1 = getint(p)) > 0);
                         break;
                     case SA_FRIENDLY_FIRE:
-                        vi->action = new friendlyfireaction((vi->num1 = getint(p)) != 0);
+                        printf("Received friendly fire on server\n");
+                        vi->num1 = getint(p);
+                        printf("1st arg: %i\n", vi->num1);
+                        vi->action = new friendlyfireaction(vi->num1 == 1);
                         break;
                     case SA_SHUFFLETEAMS:
                         vi->action = new shuffleteamaction();

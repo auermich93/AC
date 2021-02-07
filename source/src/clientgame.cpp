@@ -1522,6 +1522,9 @@ void scallvote(int *type, const char *arg1, const char *arg2, const char *arg3)
             case SA_FRIENDLY_FIRE: 
             {
                 conoutf("Calling friendly fire vote");
+                conoutf("1st arg: %s", arg1);
+                conoutf("2nd arg: %s", arg2);
+                conoutf("3rd arg: %s", arg3);
                 // TODO: enabling friendly fire if already enabled doesn't make sense, likewise for disabled friendly fire
                 // fall through
             }

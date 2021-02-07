@@ -306,15 +306,25 @@ struct friendlyfireaction : enableaction
     void perform() {
         // call this method upon vote success
 
+        printf("Current friendly fire server mode: %i\n", friendlyfire);
+        printf("New friendly fire server mode: %i\n", enable);
+
         // update server state
         friendlyfire = enable;
 
         // announce new server state to clients
         int sm = (autoteam ? AT_ENABLED : AT_DISABLED) | ((mastermode & MM_MASK) << 2) | (matchteamsize << 4) | ((friendlyfire ? FF_ENABLED : FF_DISABLED) << 8);
+
+        printf("friendly fire flag: %i\n", enable);
+        printf("Chaning server mode (friendly fire) on server, new mode: %i\n", sm);
+
         // the format indicates which protocol should be used and what params, e.g. r -> reliable, i-> int
         sendf(-1, 1, "ri2", SV_SERVERMODE, sm);
     }
+
+    // friendly is only valid in team modes
     bool isvalid() { return serveraction::isvalid() && m_teammode; }
+
     friendlyfireaction(bool enable) : enableaction(enable)
     {
         role = CR_DEFAULT;

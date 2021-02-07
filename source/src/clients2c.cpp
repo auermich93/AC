@@ -788,8 +788,12 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                     damage = getint(p),
                     armour = getint(p),
                     health = getint(p);
+                conoutf("Damage, friendly fire: %i", servstate.friendlyfire);
                 playerent *target = getclient(tcn), *actor = getclient(acn);
-                if(!target || !actor || (isteam(actor->team, target->team) && servstate.friendlyfire == FF_DISABLED)) break;
+                if (!target || !actor || (isteam(actor->team, target->team) && servstate.friendlyfire == FF_DISABLED)) {
+                    conoutf("Ignoring damage!");
+                    break;
+                }
                 target->armour = armour;
                 target->health = health;
                 dodamage(damage, target, actor, -1, type==SV_GIBDAMAGE, false);
@@ -1231,10 +1235,21 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
             case SV_SERVERMODE:
             {
                 int sm = getint(p);
+                conoutf("NEW SERVER MODE: %i", sm);
+
+                string binary = "";
+
+                // print server mode as binary string
+                unsigned int i;
+                for (i = 1 << 31; i > 0; i = i / 2)
+                    (sm & i) ? strcat(binary, "1") : strcat(binary, "0");
+                conoutf("NEW SERVER MODE [BINARY]: %s", binary);
+
                 servstate.autoteam = sm & 1;
                 servstate.mastermode = (sm >> 2) & MM_MASK;
                 servstate.matchteamsize = sm >> 4;
                 servstate.friendlyfire = sm >> 8; // TODO: fix 
+                conoutf("FRIENDLY FIRE MODE: %i", servstate.friendlyfire);
                 //if(sm & AT_SHUFFLE) playsound(TEAMSHUFFLE);    // TODO
                 break;
             }
