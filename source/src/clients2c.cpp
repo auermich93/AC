@@ -350,8 +350,9 @@ void showhudextras(char hudextras, char value){
             {
                 playerent *p = getclient(teamworkid);
                 if (!p || p == player1) teamworkid = -1;
-                else outf("\f5you covered %s",p->name); break;
+                else outf("\f5you covered %s",p->name);
             }
+            break;
         default:
         {
             if (value >= HE_NUM)
@@ -746,6 +747,8 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
             case SV_RELOAD:
             {
                 int cn = getint(p), gun = getint(p);
+                if(!valid_weapon(gun)) break;
+
                 playerent *p = getclient(cn);
                 if(p && p!=player1) p->weapons[gun]->reload(false);
                 break;
@@ -789,7 +792,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                     armour = getint(p),
                     health = getint(p);
                 playerent *target = getclient(tcn), *actor = getclient(acn);
-                if(!target || !actor) break;
+                if(!target || !actor || !valid_weapon(gun)) break;
                 target->armour = armour;
                 target->health = health;
                 if (!isteam(actor->team, target->team)) {
@@ -817,6 +820,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
 //                         medals_arrived=1;
                         loopi(medals) {
                             int mcn=getint(p); int mtype=getint(p); int mitem=getint(p);
+                            if(mtype >= END_MDS || mtype < 0) break;
                             a_medals[mtype].assigned=1;
                             a_medals[mtype].cn=mcn;
                             a_medals[mtype].item=mitem;

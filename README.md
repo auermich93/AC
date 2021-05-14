@@ -10,6 +10,8 @@ connection. It's tiny too, weighing in at a lightweight about 50 MB package
 available for [Windows, Linux, Mac](https://assault.cubers.net/download.html).
 On the correct settings, it can even run on old hardware (Pentium III and above).
 
+![screenshot](https://user-images.githubusercontent.com/7680684/69888836-9a931d80-12b3-11ea-8123-bbf06908a96f.jpg)
+
 ## Features in a nutshell:
 
  * It's **FREE**.
@@ -36,6 +38,10 @@ On the correct settings, it can even run on old hardware (Pentium III and above)
 Most of this README was directly copied from the
 [AssaultCube Homepage](https://assault.cubers.net), which should have everything
 you need in relation to AssaultCube.
+
+## Contributing:
+
+Learn [how to become a contributor and submit your own code](CONTRIBUTING.md)
 
 ## Redistribution:
 
