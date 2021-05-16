@@ -18,6 +18,7 @@ VARFP(sc_flags,      0,  0, 100, needscoresreorder = true);
 VARFP(sc_frags,      0,  1, 100, needscoresreorder = true);
 VARFP(sc_deaths,    -1,  2, 100, needscoresreorder = true);
 VARFP(sc_ratio,     -1, -1, 100, needscoresreorder = true);
+VARFP(sc_damage,    -1,  -1, 100, needscoresreorder = true);
 VARFP(sc_lag,       -1,  5, 100, needscoresreorder = true);
 VARFP(sc_clientnum,  0,  6, 100, needscoresreorder = true);
 VARFP(sc_name,       0,  7, 100, needscoresreorder = true);
@@ -85,9 +86,9 @@ vector<discscore> discscores;
 
 struct teamscore
 {
-    int team, frags, deaths, flagscore, points;
+    int team, frags, deaths, flagscore, points, damage;
     vector<playerent *> teammembers;
-    teamscore(int t) : team(t), frags(0), deaths(0), flagscore(0), points(0) {}
+    teamscore(int t) : team(t), frags(0), deaths(0), damage(0), flagscore(0), points(0) {}
 
     void addplayer(playerent *d)
     {
@@ -95,6 +96,7 @@ struct teamscore
         teammembers.add(d);
         frags += d->frags;
         deaths += d->deaths;
+        damage += d->damage;
         if(m_flags_) flagscore += d->flagscore;
     }
 
@@ -102,7 +104,7 @@ struct teamscore
     {
         frags += d.frags;
         deaths += d.deaths;
-        points += d.points;
+        damage += d.damage;
         if(m_flags_) flagscore += d.flags;
     }
 };
@@ -134,6 +136,8 @@ static int teamscorecmp(const teamscore *x, const teamscore *y)
     if(x->frags < y->frags) return 1;
     if(x->points > y->points) return -1;
     if(x->points < y->points) return 1;
+    if(x->damage > y->damage) return -1;
+    if (x->damage < y->damage) return 1;
     if(x->deaths < y->deaths) return -1;
     return 0;
 }
@@ -146,6 +150,8 @@ static int scorecmp(playerent **x, playerent **y)
     if((*x)->frags < (*y)->frags) return 1;
     if((*x)->deaths > (*y)->deaths) return 1;
     if((*x)->deaths < (*y)->deaths) return -1;
+    if ((*x)->damage > (*y)->damage) return 1;
+    if ((*x)->damage < (*y)->damage) return -1;
     if((*x)->lifesequence > (*y)->lifesequence) return 1;
     if((*x)->lifesequence < (*y)->lifesequence) return -1;
     return 0;
@@ -161,6 +167,8 @@ static int discscorecmp(const discscore *x, const discscore *y)
     if(x->frags < y->frags) return 1;
     if(x->deaths > y->deaths) return 1;
     if(x->deaths < y->deaths) return -1;
+    if (x->damage > y->damage) return -1;
+    if (x->damage < y->damage) return 1;
     return strcmp(x->name, y->name);
 }
 
@@ -191,6 +199,7 @@ void renderdiscscores(int team)
         line.addcol(sc_frags, "%d", d.frags);
         line.addcol(sc_deaths, "%d", d.deaths);
         line.addcol(sc_ratio, "%.2f", SCORERATIO(d.frags, d.deaths));
+        line.addcol(sc_damage, "%d", d.damage);
         line.addcol(sc_lag, "%s", clag);
         line.addcol(sc_clientnum, "DISC");
         line.addcol(sc_name, "%s", d.name);
@@ -222,6 +231,7 @@ void renderscore(playerent *d)
     line.addcol(sc_frags, "%d", d->frags);
     line.addcol(sc_deaths, "%d", d->deaths);
     line.addcol(sc_ratio, "%.2f", SCORERATIO(d->frags, d->deaths));
+    if(multiplayer(NULL) || watchingdemo) line.addcol(sc_damage, "%d", d->damage);
     if(multiplayer(NULL) || watchingdemo) line.addcol(sc_lag, "%s", lagping);
 
     line.addcol(sc_clientnum, "\fs\f%d%d\fr", cncolumncolor, d->clientnum);
@@ -251,6 +261,7 @@ void renderteamscore(teamscore *t)
     line.addcol(sc_frags, "%d", t->frags);
     line.addcol(sc_deaths, "%d", t->deaths);
     line.addcol(sc_ratio, "%.2f", SCORERATIO(t->frags, t->deaths));
+    if(multiplayer(NULL) || watchingdemo) line.addcol(sc_damage, "%d", t->damage);
     if(multiplayer(NULL) || watchingdemo) line.addcol(sc_lag);
     line.addcol(sc_clientnum, "%s", team_string(t->team));
     int n = t->teammembers.length();
@@ -274,6 +285,7 @@ void reorderscorecolumns()
     sscore.addcol(sc_frags, "frags");
     sscore.addcol(sc_deaths, "deaths");
     sscore.addcol(sc_ratio, "ratio");
+    if(multiplayer(NULL) || watchingdemo) sscore.addcol(sc_damage, "damage");
     if(multiplayer(NULL) || watchingdemo) sscore.addcol(sc_lag, "pj/ping");
     sscore.addcol(sc_clientnum, "cn");
     sscore.addcol(sc_name, "name");
