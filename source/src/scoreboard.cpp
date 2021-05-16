@@ -136,6 +136,8 @@ static int teamscorecmp(const teamscore *x, const teamscore *y)
     if(x->frags < y->frags) return 1;
     if(x->points > y->points) return -1;
     if(x->points < y->points) return 1;
+    if(x->damage > y->damage) return -1;
+    if (x->damage < y->damage) return 1;
     if(x->deaths < y->deaths) return -1;
     return 0;
 }
@@ -148,6 +150,8 @@ static int scorecmp(playerent **x, playerent **y)
     if((*x)->frags < (*y)->frags) return 1;
     if((*x)->deaths > (*y)->deaths) return 1;
     if((*x)->deaths < (*y)->deaths) return -1;
+    if ((*x)->damage > (*y)->damage) return 1;
+    if ((*x)->damage < (*y)->damage) return -1;
     if((*x)->lifesequence > (*y)->lifesequence) return 1;
     if((*x)->lifesequence < (*y)->lifesequence) return -1;
     return 0;
@@ -163,6 +167,8 @@ static int discscorecmp(const discscore *x, const discscore *y)
     if(x->frags < y->frags) return 1;
     if(x->deaths > y->deaths) return 1;
     if(x->deaths < y->deaths) return -1;
+    if (x->damage > y->damage) return -1;
+    if (x->damage < y->damage) return 1;
     return strcmp(x->name, y->name);
 }
 
@@ -225,7 +231,7 @@ void renderscore(playerent *d)
     line.addcol(sc_frags, "%d", d->frags);
     line.addcol(sc_deaths, "%d", d->deaths);
     line.addcol(sc_ratio, "%.2f", SCORERATIO(d->frags, d->deaths));
-    line.addcol(sc_damage, "%d", d->damage);
+    if(multiplayer(NULL) || watchingdemo) line.addcol(sc_damage, "%d", d->damage);
     if(multiplayer(NULL) || watchingdemo) line.addcol(sc_lag, "%s", lagping);
 
     line.addcol(sc_clientnum, "\fs\f%d%d\fr", cncolumncolor, d->clientnum);
@@ -255,7 +261,7 @@ void renderteamscore(teamscore *t)
     line.addcol(sc_frags, "%d", t->frags);
     line.addcol(sc_deaths, "%d", t->deaths);
     line.addcol(sc_ratio, "%.2f", SCORERATIO(t->frags, t->deaths));
-    line.addcol(sc_damage, "%d", t->damage);
+    if(multiplayer(NULL) || watchingdemo) line.addcol(sc_damage, "%d", t->damage);
     if(multiplayer(NULL) || watchingdemo) line.addcol(sc_lag);
     line.addcol(sc_clientnum, "%s", team_string(t->team));
     int n = t->teammembers.length();
@@ -279,7 +285,7 @@ void reorderscorecolumns()
     sscore.addcol(sc_frags, "frags");
     sscore.addcol(sc_deaths, "deaths");
     sscore.addcol(sc_ratio, "ratio");
-    sscore.addcol(sc_damage, "damage");
+    if(multiplayer(NULL) || watchingdemo) sscore.addcol(sc_damage, "damage");
     if(multiplayer(NULL) || watchingdemo) sscore.addcol(sc_lag, "pj/ping");
     sscore.addcol(sc_clientnum, "cn");
     sscore.addcol(sc_name, "name");
