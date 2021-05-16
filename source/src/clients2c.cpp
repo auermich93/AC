@@ -720,6 +720,10 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                 if(!target || !actor || !valid_weapon(gun)) break;
                 target->armour = armour;
                 target->health = health;
+                if (!isteam(actor->team, target->team)) {
+                    // tking shouldn't increase damage score
+                    actor->damage += damage;
+                }
                 dodamage(damage, target, actor, -1, type==SV_GIBDAMAGE, false);
                 actor->pstatdamage[gun]+=damage; //NEW
                 break;
@@ -761,6 +765,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                         deaths = getint(p),
                         health = getint(p),
                         armour = getint(p),
+                        damage = getint(p),
                         teamkills = getint(p);
                     int ammo[NUMGUNS], mag[NUMGUNS];
                     loopi(NUMGUNS) ammo[i] = getint(p);
@@ -772,6 +777,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                     d->flagscore = flagscore;
                     d->frags = frags;
                     d->deaths = deaths;
+                    d->damage = damage;
                     d->tks = teamkills;
                     if(d!=player1)
                     {
@@ -800,7 +806,7 @@ void parsemessages(int cn, playerent *d, ucharbuf &p, bool demo = false)
                     ds.flags = getint(p);
                     ds.frags = getint(p);
                     ds.deaths = getint(p);
-                    ds.points = getint(p);
+                    ds.damage = getint(p);
                 }
                 break;
             }

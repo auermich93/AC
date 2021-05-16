@@ -282,6 +282,7 @@ void playerinfo(int *cn, const char *attr)
     ATTR_INT(flags, p->flagscore);
     ATTR_INT(deaths, p->deaths);
     ATTR_INT(tks, p->tks);
+    ATTR_INT(damage, p->damage);
     ATTR_INT(alive, p->state == CS_ALIVE ? 1 : 0);
     ATTR_INT(spect, p->team == TEAM_SPECT || p->spectatemode == SM_FLY ? 1 : 0);
     ATTR_INT(cn, p->clientnum); // only useful to get player1's client number.
@@ -317,6 +318,7 @@ void teaminfo(const char *team, const char *attr)
     int t_flags = 0;
     int t_frags = 0;
     int t_deaths = 0;
+    int t_damage = 0;
 
     string teammembers = "";
 
@@ -325,6 +327,7 @@ void teaminfo(const char *team, const char *attr)
         t_frags += players[i]->frags;
         t_deaths += players[i]->deaths;
         t_flags += players[i]->flagscore;
+        t_damage += players[i]->damage;
         concatformatstring(teammembers, "%d ", players[i]->clientnum);
     }
 
@@ -333,6 +336,7 @@ void teaminfo(const char *team, const char *attr)
         t_frags += discscores[i].frags;
         t_deaths += discscores[i].deaths;
         t_flags += discscores[i].flags;
+        t_damage += discscores[i].damage;
     }
 
     if(player1->team == t)
@@ -340,12 +344,14 @@ void teaminfo(const char *team, const char *attr)
         t_frags += player1->frags;
         t_deaths += player1->deaths;
         t_flags += player1->flagscore;
+        t_damage += player1->damage;
         concatformatstring(teammembers, "%d ", player1->clientnum);
     }
 
     ATTR_INT(flags, t_flags);
     ATTR_INT(frags, t_frags);
     ATTR_INT(deaths, t_deaths);
+    ATTR_INT(damage, t_damage);
     ATTR_STR(name, team_string(t));
     ATTR_STR(players, teammembers);
     conoutf("invalid attribute: %s", attr);
